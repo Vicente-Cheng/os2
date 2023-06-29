@@ -10,12 +10,16 @@ jobs:
   create-installer-pr:
     runs-on: ubuntu-latest
     steps:
-      - name: setup target branch
-        run: echo $(${{ github.ref_name }}%%-*)
+      - uses: jungwinter/split@v2
+        id: spliter
+        with:
+          msg: ${{ github.ref_name }}
+          separator: '-'
       - name: Clone harvester-installer repo
         uses: actions/checkout@v3
         with:
           repository: harvester/harvester-installer
+          ref: ${{ steps.spliter.outputs._0 }}
       - name: Update os image
         run: |
           sed -i "s,^BASE_OS_IMAGE=.*,BASE_OS_IMAGE=\"${{ env.IMAGE_NAME }}\"," scripts/package-harvester-os
