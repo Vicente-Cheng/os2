@@ -61,31 +61,6 @@ jobs:
         with:
           repository: harvester/harvester-installer
       - name: Update os image
-        run: sed -i "s,^BASE_OS_IMAGE=.*,BASE_OS_IMAGE=\"${{ env.IMAGE_NAME }}\"," scripts/package-harvester-os
-      - name: Create installer PR
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.BOT_TOKEN }}
-          commit-message: Bump OS ${{ github.ref_name }}
-          committer: GitHub <noreply@github.com>
-          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
-          signoff: false
-          branch: bump-os-${{ github.ref_name }}
-          delete-branch: true
-          title: 'Bump OS ${{ github.ref_name }}'
-          draft: false
-          body: |
-            **Problem:**
-            Harvester base OS needs to update.
-
-            **Solution:**
-            Bump OS image to [${{ env.IMAGE_NAME }}](https://github.com/harvester/os2/releases/tag/${{ github.ref_name }}).
-
-            **Related Issue:**
-
-            **Test plan:**
-
-            **More info:**
-            ```
-            ${{ steps.read.outputs.content }}
-            ```
+        run: |
+          sed -i "s,^BASE_OS_IMAGE=.*,BASE_OS_IMAGE=\"${{ env.IMAGE_NAME }}\"," scripts/package-harvester-os
+          echo "patched result: $(grep ^BASE_OS_IMAGE scripts/package-harvester-os)"
