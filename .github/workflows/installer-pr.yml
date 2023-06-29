@@ -45,6 +45,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: generate-image-diff
     steps:
+      - name: setup target branch
+        run: echo $(${{ github.ref_name }}%%-*)
       - name: Download container-diff result
         uses: actions/download-artifact@v3
         with:
