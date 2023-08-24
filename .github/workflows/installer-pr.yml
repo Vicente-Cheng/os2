@@ -20,6 +20,10 @@ jobs:
         with:
           repository: harvester/harvester-installer
           ref: ${{ steps.spliter.outputs._0 }}
+      - name: Get current OS image from installer
+        run: |
+          curl -sfL https://raw.githubusercontent.com/harvester/harvester-installer/${{ steps.spliter.outputs._0 }}/scripts/package-harvester-os -o /tmp/package-harvester-os
+          grep '^BASE_OS_IMAGE="rancher/harvester-os:' /tmp/package-harvester-os
       - name: Update os image
         run: |
           sed -i "s,^BASE_OS_IMAGE=.*,BASE_OS_IMAGE=\"${{ env.IMAGE_NAME }}\"," scripts/package-harvester-os
