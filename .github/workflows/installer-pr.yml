@@ -28,3 +28,8 @@ jobs:
         run: |
           sed -i "s,^BASE_OS_IMAGE=.*,BASE_OS_IMAGE=\"${{ env.IMAGE_NAME }}\"," scripts/package-harvester-os
           echo "patched result: $(grep ^BASE_OS_IMAGE scripts/package-harvester-os)"
+      - name: Update nv driver
+        run: sed -i "/tag:/ {N; /harvester-nvidia-driver-toolkit/ s/tag:.*\n/tag: \"${{ steps.spliter.outputs._1 }}\"\n/}" pkg/config/templates
+/rancherd-22-addons.yaml
+        echo "patched result: $(grep -B1 "harvester-nvidia-driver-toolkit" pkg/config/templates
+/rancherd-22-addons.yaml)"
