@@ -28,7 +28,7 @@ jobs:
             if (foundRelease) {
               console.log(`Found release ${foundRelease.name} with tag ${foundRelease.tag_name}`);
               
-              echo "releaseName=${foundRelease.name}" >> "$GITHUB_OUTPUT"
+              echo "releaseName=${foundRelease.name}"
             } else {
               console.log(`No release found with the name ${releaseNameToFind}`);
               return { error: `No release found with the name ${releaseNameToFind}` };
