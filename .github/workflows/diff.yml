@@ -10,9 +10,6 @@ jobs:
       image: registry.suse.com/bci/bci-base:15.4
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
       - name: Get v1.3 latest release
         id: get_release
         uses: actions/github-script@v6
