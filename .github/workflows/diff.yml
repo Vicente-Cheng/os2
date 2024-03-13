@@ -28,7 +28,7 @@ jobs:
 
             if (foundRelease) {
               const releaseName = foundRelease.name;
-              const osImage = rancher/harvester-os:foundRelease.name;
+              const osImage = "rancher/harvester-os:$foundRelease.name";
               core.setOutput('releaseName', releaseName);
               core.setOutput('osImage', osImage);
 
