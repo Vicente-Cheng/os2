@@ -73,12 +73,19 @@ jobs:
         with:
           name: diff-result-v1.3.x
           path: diff-result-v1.3.x.txt
+      - name: debug
+        if: steps.get_release_v1_3_x.outputs.found
+        run: |
+          echo "found diff: `${{ env.FOUND_DIFF_v1_3_x }}`"
 
   show-the-packages-differences:
       needs: check-whole-versions-packages-diff
       runs-on: ubuntu-latest
       
       steps:
+        - name: debug
+          run: |
+            echo "found diff: `${{ env.FOUND_DIFF_v1_3_x }}`"
         - name: Download container-diff result
           if: env.FOUND_DIFF_v1_3_x == 'true'
           uses: actions/download-artifact@v3
