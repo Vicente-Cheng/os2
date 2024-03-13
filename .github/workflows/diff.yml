@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      
+
       - name: Get release by name
         id: get_release
         uses: actions/github-script@v4
@@ -21,24 +21,20 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo
             });
-
             const releases = response.data;
-            const releaseNameToFind = "YOUR_RELEASE_NAME"; // Replace with the name you're searching for
-
+            const releaseNameToFind = "v1.3"; // Replace with the name you're searching for
             const foundRelease = releases.find(release => release.name.includes(releaseNameToFind));
-            
+            console.log(`whole release ${releases}`);
             if (foundRelease) {
               console.log(`Found release ${foundRelease.name} with tag ${foundRelease.tag_name}`);
               console.log(`URL: ${foundRelease.html_url}`);
               console.log(`Assets: ${foundRelease.assets.map(asset => asset.name).join(', ')}`);
-
-              // Use echo to set values to GITHUB_OUTPUT
-              echo "::set-env name=RELEASE_NAME::${foundRelease.name}"
-              echo "::set-env name=TAG_NAME::${foundRelease.tag_name}"
-              echo "::set-env name=RELEASE_URL::${foundRelease.html_url}"
+              // You can use outputs to pass data to subsequent steps if needed
+              return { releaseName: foundRelease.name };
             } else {
-              echo "No release found with the name ${releaseNameToFind}"
+              console.log(`No release found with the name ${releaseNameToFind}`);
+              return { error: `No release found with the name ${releaseNameToFind}` };
             }
-
+      
       - name: Show the base image name
-        run: echo "BASEOS IMG `rancher/harvester-os:${{ steps.get_release.outputs.release_name }}`"
+        run: echo "BASEOS IMG `rancher/harvester-os:${{ steps.get_release.outputs.releaseName }}`"
