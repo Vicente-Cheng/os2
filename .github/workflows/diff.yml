@@ -23,7 +23,7 @@ jobs:
             });
 
             const releases = response.data;
-            const releaseNameToFind = "v1.2"; // Replace with the name you're searching for
+            const releaseNameToFind = "v1.3"; // Replace with the name you're searching for
 
             const foundRelease = releases.find(release => release.name.includes(releaseNameToFind));
 
@@ -41,5 +41,5 @@ jobs:
             }
       
 
-      #- name: Use found release information
-      #  run: echo "Found release ${{ steps.get_release.outputs.releaseName }} with tag ${{ steps.get_release.outputs.tagName }} at ${{ steps.get_release.outputs.releaseUrl }}"
+      - name: Show the base image name
+        run: echo "BASEOS IMG `rancher/harvester-os:${{ steps.get_release.outputs.foundRelease.name }}`"
