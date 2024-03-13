@@ -13,7 +13,7 @@ jobs:
 
       - name: Get release by name
         id: get_release
-        uses: actions/github-script@v4
+        uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -27,8 +27,7 @@ jobs:
             
             if (foundRelease) {
               console.log(`Found release ${foundRelease.name} with tag ${foundRelease.tag_name}`);
-              const output = `releaseName=${foundRelease.name}`;
-              console.log(`${GITHUB_OUTPUT}=${output}`);
+              core.setOutput('releaseName', '$foundRelease.name');
             } else {
               console.log(`No release found with the name ${releaseNameToFind}`);
             }
