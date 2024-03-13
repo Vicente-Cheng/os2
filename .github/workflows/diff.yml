@@ -77,20 +77,23 @@ jobs:
   show-the-packages-differences:
       needs: check-whole-versions-packages-diff
       runs-on: ubuntu-latest
-      if: env.FOUND_DIFF_v1_3_x == 'true'
       
       steps:
         - name: Download container-diff result
+          if: env.FOUND_DIFF_v1_3_x == 'true'
           uses: actions/download-artifact@v3
           with:
             name: diff-result-v1.3.x
         - name: Read diff result
+          if: env.FOUND_DIFF_v1_3_x == 'true'
           id: read
           uses: juliangruber/read-file-action@v1
           with:
             path: ./diff-result-v1.3.x.txt
         - name: Remove unused files
+          if: env.FOUND_DIFF_v1_3_x == 'true'
           run: rm diff-result-v1.3.x.txt
         - name: Show output
+          if: env.FOUND_DIFF_v1_3_x == 'true'
           run: echo ${{ steps.read.outputs.content }}
 
