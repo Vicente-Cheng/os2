@@ -33,8 +33,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            
-
+            core.setOutput('found', false);
             const releases = ${{ steps.get_all_releases.outputs.allReleases }};
             const releaseNameToFind = "v1.3";
             const foundRelease = releases.find(release => release.name.includes(releaseNameToFind));
@@ -42,29 +41,64 @@ jobs:
             if (foundRelease) {
               const releaseName = foundRelease.name;
               const osImage = `rancher/harvester-os:${foundRelease.name}`;
+              
               core.setOutput('releaseName', releaseName);
               core.setOutput('osImage', osImage);
+              core.setOutput('found', true);
+            }
+      - name: Get v1.2 latest release
+        id: get_release_v1_2_x
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.setOutput('found', false);
+            const releases = ${{ steps.get_all_releases.outputs.allReleases }};
+            const releaseNameToFind = "v1.2";
+            const foundRelease = releases.find(release => release.name.includes(releaseNameToFind));
 
-            } else {
-              core.setFailed(`No release found with the name ${releaseNameToFind}`);
+            if (foundRelease) {
+              const releaseName = foundRelease.name;
+              const osImage = `rancher/harvester-os:${foundRelease.name}`;
+              core.setOutput('releaseName', releaseName);
+              core.setOutput('osImage', osImage);
+              core.setOutput('found', true);
+            }
+      - name: Get v1.1 latest release
+        id: get_release_v1_1_x
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.setOutput('found', false);
+            const releases = ${{ steps.get_all_releases.outputs.allReleases }};
+            const releaseNameToFind = "v1.1";
+            const foundRelease = releases.find(release => release.name.includes(releaseNameToFind));
+
+            if (foundRelease) {
+              const releaseName = foundRelease.name;
+              const osImage = `rancher/harvester-os:${foundRelease.name}`;
+              core.setOutput('releaseName', releaseName);
+              core.setOutput('osImage', osImage);
+              core.setOutput('found', true);
             }
       - name: Install docker
         run: zypper ref && zypper -n install docker
-      - name: Pull current os image
+      - name: Install container-diff
+        run: |
+          curl -sfL https://github.com/GoogleContainerTools/container-diff/releases/download/v0.17.0/container-diff-linux-amd64 -o /usr/bin/container-diff
+          chmod +x /usr/bin/container-diff
+      - name: Pull current v1.3.x os image
+        if: steps.get_release_v1_3_x.outputs.found
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 1
           max_attempts: 10
           retry_wait_seconds: 60
           command: 'docker pull ${{ steps.get_release_v1_3_x.outputs.osImage }}'
-      - name: Install container-diff
-        run: |
-          curl -sfL https://github.com/GoogleContainerTools/container-diff/releases/download/v0.17.0/container-diff-linux-amd64 -o /usr/bin/container-diff
-          chmod +x /usr/bin/container-diff
-      - name: Run container-diff
+      - name: Run container-diff for v1.3.x
+        if: steps.get_release_v1_3_x.outputs.found
         run: |
           docker pull ${{ env.OS_IMAGE_v1_3_x }}
           echo "Diff ${{ env.OS_IMAGE_v1_3_x }} with ${{ steps.get_release_v1_3_x.outputs.osImage }}..."
           container-diff diff daemon://docker.io/${{ env.OS_IMAGE_v1_3_x }} daemon://docker.io/${{ steps.get_release_v1_3_x.outputs.osImage }} --type=rpm --output=diff-result.txt
-          cat diff-result.txt
+          cat diff-result-v1.3.x.txt
       
