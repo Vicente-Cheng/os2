@@ -67,7 +67,7 @@ jobs:
           container-diff diff daemon://docker.io/${{ env.OS_IMAGE_v1_3_x }} daemon://docker.io/${{ steps.get_release_v1_3_x.outputs.osImage }} --type=rpm --output=diff-result-v1.3.x.txt
           cat diff-result-v1.3.x.txt
           echo "DIFF_v1_3_x=$(cat diff-result-v1.3.x.txt)" >> $GITHUB_ENV
-          echo "FOUND_DIFF_v1_3_x=true" >> $GITHUBENV
+          echo "FOUND_DIFF_v1_3_x=true" >> $GITHUB_ENV
 
   show-the-packages-differences:
       runs-on: ubuntu-latest
