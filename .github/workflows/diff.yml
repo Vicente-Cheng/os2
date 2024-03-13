@@ -23,18 +23,22 @@ jobs:
             });
 
             const releases = response.data;
-            const releaseNameToFind = "v1.3"; // Replace with the name you're searching for
-            
-            const foundRelease = releases.find(release => release.name.includes(releaseNameToFind));
+            const releaseNameToFind = "YOUR_RELEASE_NAME"; // Replace with the name you're searching for
 
+            const foundRelease = releases.find(release => release.name.includes(releaseNameToFind));
+            
             if (foundRelease) {
-              echo "releaseName=$foundRelease.name" >> "$GITHUB_OUTPUT"
-              return
+              console.log(`Found release ${foundRelease.name} with tag ${foundRelease.tag_name}`);
+              console.log(`URL: ${foundRelease.html_url}`);
+              console.log(`Assets: ${foundRelease.assets.map(asset => asset.name).join(', ')}`);
+
+              // Use echo to set values to GITHUB_OUTPUT
+              echo "::set-env name=RELEASE_NAME::${foundRelease.name}"
+              echo "::set-env name=TAG_NAME::${foundRelease.tag_name}"
+              echo "::set-env name=RELEASE_URL::${foundRelease.html_url}"
             } else {
-              console.log(`No release found with the name ${releaseNameToFind}`);
-              return { error: `No release found with the name ${releaseNameToFind}` };
+              echo "No release found with the name ${releaseNameToFind}"
             }
-      
 
       - name: Show the base image name
-        run: echo "BASEOS IMG `rancher/harvester-os:${{ steps.get_release.outputs.releaseName }}`"
+        run: echo "BASEOS IMG `rancher/harvester-os:${{ steps.get_release.outputs.release_name }}`"
