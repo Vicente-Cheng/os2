@@ -9,7 +9,7 @@ env:
   OS_IMAGE_v1_1_x: registry.opensuse.org/isv/rancher/harvester/os/v1.1/main/baseos:latest
 
 jobs:
-  package-diff-v1_3:
+  whole-versions-packages-diff:
     runs-on: ubuntu-latest
     container:
       image: registry.suse.com/bci/bci-base:15.4
@@ -99,6 +99,53 @@ jobs:
         run: |
           docker pull ${{ env.OS_IMAGE_v1_3_x }}
           echo "Diff ${{ env.OS_IMAGE_v1_3_x }} with ${{ steps.get_release_v1_3_x.outputs.osImage }}..."
-          container-diff diff daemon://docker.io/${{ env.OS_IMAGE_v1_3_x }} daemon://docker.io/${{ steps.get_release_v1_3_x.outputs.osImage }} --type=rpm --output=diff-result.txt
+          container-diff diff daemon://docker.io/${{ env.OS_IMAGE_v1_3_x }} daemon://docker.io/${{ steps.get_release_v1_3_x.outputs.osImage }} --type=rpm --output=diff-result-v1.3.x.txt
           cat diff-result-v1.3.x.txt
-      
+      - name: Upload v1.3.x container-diff result
+        if: steps.get_release_v1_3_x.outputs.found
+        uses: actions/upload-artifact@v3
+        with:
+          name: diff-result-v1.3.x
+          path: diff-result-v1.3.x.txt
+      - name: Pull current v1.2.x os image
+        if: steps.get_release_v1_2_x.outputs.found
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 1
+          max_attempts: 10
+          retry_wait_seconds: 60
+          command: 'docker pull ${{ steps.get_release_v1_2_x.outputs.osImage }}'
+      - name: Run container-diff for v1.2.x
+        if: steps.get_release_v1_2_x.outputs.found
+        run: |
+          docker pull ${{ env.OS_IMAGE_v1_2_x }}
+          echo "Diff ${{ env.OS_IMAGE_v1_2_x }} with ${{ steps.get_release_v1_2_x.outputs.osImage }}..."
+          container-diff diff daemon://docker.io/${{ env.OS_IMAGE_v1_2_x }} daemon://docker.io/${{ steps.get_release_v1_2_x.outputs.osImage }} --type=rpm --output=diff-result-v1.2.x.txt
+          cat diff-result-v1.2.x.txt
+      - name: Upload v1.2.x container-diff result
+        if: steps.get_release_v1_2_x.outputs.found
+        uses: actions/upload-artifact@v3
+        with:
+          name: diff-result-v1.2.x
+          path: diff-result-v1.2.x.txt
+      - name: Pull current v1.1.x os image
+        if: steps.get_release_v1_1_x.outputs.found
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 1
+          max_attempts: 10
+          retry_wait_seconds: 60
+          command: 'docker pull ${{ steps.get_release_v1_1_x.outputs.osImage }}'
+      - name: Run container-diff for v1.1.x
+        if: steps.get_release_v1_1_x.outputs.found
+        run: |
+          docker pull ${{ env.OS_IMAGE_v1_1_x }}
+          echo "Diff ${{ env.OS_IMAGE_v1_1_x }} with ${{ steps.get_release_v1_1_x.outputs.osImage }}..."
+          container-diff diff daemon://docker.io/${{ env.OS_IMAGE_v1_1_x }} daemon://docker.io/${{ steps.get_release_v1_1_x.outputs.osImage }} --type=rpm --output=diff-result-v1.1.x.txt
+          cat diff-result-v1.1.x.txt
+      - name: Upload v1.1.x container-diff result
+        if: steps.get_release_v1_1_x.outputs.found
+        uses: actions/upload-artifact@v3
+        with:
+          name: diff-result-v1.1.x
+          path: diff-result-v1.1.x.txt
