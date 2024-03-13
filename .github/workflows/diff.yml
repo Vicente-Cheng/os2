@@ -1,10 +1,12 @@
-name: get release
+name: Package Differences
 
 on:
   workflow_dispatch:
 
 env:
   OS_IMAGE_v1_3_x: registry.opensuse.org/isv/rancher/harvester/os/v1.3/main/baseos:latest
+  OS_IMAGE_v1_2_x: registry.opensuse.org/isv/rancher/harvester/os/v1.2/main/baseos:latest
+  OS_IMAGE_v1_1_x: registry.opensuse.org/isv/rancher/harvester/os/v1.1/main/baseos:latest
 
 jobs:
   package-diff-v1_3:
@@ -13,8 +15,8 @@ jobs:
       image: registry.suse.com/bci/bci-base:15.4
 
     steps:
-      - name: Get v1.3 latest release
-        id: get_release
+      - name: Get all release
+        id: get_all_releases
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -23,10 +25,18 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo
             });
-
+            
             const releases = response.data;
-            const releaseNameToFind = "v1.3"; // Replace with the name you're searching for
+            core.setOutput('allReleases', releases);
+      - name: Get v1.3 latest release
+        id: get_release_v1_3_x
+        uses: actions/github-script@v6
+        with:
+          script: |
+            
 
+            const releases = ${{ steps.get_all_releases.outputs.allReleases }};
+            const releaseNameToFind = "v1.3";
             const foundRelease = releases.find(release => release.name.includes(releaseNameToFind));
 
             if (foundRelease) {
@@ -46,7 +56,7 @@ jobs:
           timeout_minutes: 1
           max_attempts: 10
           retry_wait_seconds: 60
-          command: 'docker pull ${{ steps.get_release.outputs.osImage }}'
+          command: 'docker pull ${{ steps.get_release_v1_3_x.outputs.osImage }}'
       - name: Install container-diff
         run: |
           curl -sfL https://github.com/GoogleContainerTools/container-diff/releases/download/v0.17.0/container-diff-linux-amd64 -o /usr/bin/container-diff
@@ -54,7 +64,7 @@ jobs:
       - name: Run container-diff
         run: |
           docker pull ${{ env.OS_IMAGE_v1_3_x }}
-          echo "Diff ${{ env.OS_IMAGE_v1_3_x }} with ${{ steps.get_release.outputs.osImage }}..."
-          container-diff diff daemon://docker.io/${{ env.OS_IMAGE_v1_3_x }} daemon://docker.io/${{ steps.get_release.outputs.osImage }} --type=rpm --output=diff-result.txt
+          echo "Diff ${{ env.OS_IMAGE_v1_3_x }} with ${{ steps.get_release_v1_3_x.outputs.osImage }}..."
+          container-diff diff daemon://docker.io/${{ env.OS_IMAGE_v1_3_x }} daemon://docker.io/${{ steps.get_release_v1_3_x.outputs.osImage }} --type=rpm --output=diff-result.txt
           cat diff-result.txt
       
