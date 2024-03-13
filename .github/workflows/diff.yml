@@ -75,8 +75,8 @@ jobs:
           path: diff-result-v1.3.x.txt
 
   show-the-packages-differences:
-      runs-on: ubuntu-latest
       needs: check-whole-versions-packages-diff
+      runs-on: ubuntu-latest
       if: env.FOUND_DIFF_v1_3_x == 'true'
       
       steps:
