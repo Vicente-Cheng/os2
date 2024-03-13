@@ -4,14 +4,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  get-release:
+  package-diff-v1_3:
     runs-on: ubuntu-latest
+    container:
+      image: registry.suse.com/bci/bci-base:15.4
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Get release by name
+      - name: Get v1.3 latest release
         id: get_release
         uses: actions/github-script@v6
         with:
@@ -29,19 +31,31 @@ jobs:
 
             if (foundRelease) {
               const releaseName = foundRelease.name;
-              const tagName = foundRelease.tag_name;
-              const releaseUrl = foundRelease.html_url;
-
+              const osImage = rancher/harvester-os:foundRelease.name;
               core.setOutput('releaseName', releaseName);
-              core.setOutput('tagName', tagName);
-              core.setOutput('releaseUrl', releaseUrl);
+              core.setOutput('osImage', osImage);
 
-              console.log(`Found release ${releaseName} with tag ${tagName}`);
-              console.log(`URL: ${releaseUrl}`);
-              console.log(`Assets: ${foundRelease.assets.map(asset => asset.name).join(', ')}`);
             } else {
               core.setFailed(`No release found with the name ${releaseNameToFind}`);
             }
+      - name: Install docker
+        run: zypper ref && zypper -n install docker
+      - name: Pull current os image
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 1
+          max_attempts: 10
+          retry_wait_seconds: 60
+          command: 'docker pull ${{ steps.get_release.outputs.osImage }}'
+      - name: Install container-diff
+        run: |
+          curl -sfL https://github.com/GoogleContainerTools/container-diff/releases/download/v0.17.0/container-diff-linux-amd64 -o /usr/bin/container-diff
+          chmod +x /usr/bin/container-diff
+      - name: Run container-diff
+        run: |
+          const LATEST_OS_IMAGE = "registry.opensuse.org/isv/rancher/harvester/os/v1.3/main/baseos:latest"
+          docker pull $LATEST_OS_IMAGE
+          echo "Diff $BASE_OS_IMAGE with ${{ steps.get_release.outputs.osImage }}..."
+          container-diff diff daemon://docker.io/$LATEST_OS_IMAGE daemon://docker.io/${{ steps.get_release.outputs.osImage }} --type=rpm --output=diff-result.txt
+          cat diff-result.txt
       
-      - name: Show the base image name
-        run: echo "BASEOS IMG `rancher/harvester-os:${{ steps.get_release.outputs.releaseName }}`"
