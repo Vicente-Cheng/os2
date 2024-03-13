@@ -21,15 +21,26 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo
             });
+
             const releases = response.data;
-            const releaseNameToFind = "v1.3"; // Replace with the name you're searching for
+            const releaseNameToFind = "YOUR_RELEASE_NAME"; // Replace with the name you're searching for
+
             const foundRelease = releases.find(release => release.name.includes(releaseNameToFind));
-            
+
             if (foundRelease) {
-              console.log(`Found release ${foundRelease.name} with tag ${foundRelease.tag_name}`);
-              core.setOutput('releaseName', '$foundRelease.name');
+              const releaseName = foundRelease.name;
+              const tagName = foundRelease.tag_name;
+              const releaseUrl = foundRelease.html_url;
+
+              core.setOutput('releaseName', releaseName);
+              core.setOutput('tagName', tagName);
+              core.setOutput('releaseUrl', releaseUrl);
+
+              console.log(`Found release ${releaseName} with tag ${tagName}`);
+              console.log(`URL: ${releaseUrl}`);
+              console.log(`Assets: ${foundRelease.assets.map(asset => asset.name).join(', ')}`);
             } else {
-              console.log(`No release found with the name ${releaseNameToFind}`);
+              core.setFailed(`No release found with the name ${releaseNameToFind}`);
             }
       
       - name: Show the base image name
