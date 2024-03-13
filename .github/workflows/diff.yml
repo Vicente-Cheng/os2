@@ -34,7 +34,7 @@ jobs:
               console.log(`Assets: ${foundRelease.assets.map(asset => asset.name).join(', ')}`);
 
               // You can use outputs to pass data to subsequent steps if needed
-              return { releaseName: foundRelease.name };
+              return { releaseName=${foundRelease.name} };
             } else {
               console.log(`No release found with the name ${releaseNameToFind}`);
               return { error: `No release found with the name ${releaseNameToFind}` };
