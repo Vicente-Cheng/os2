@@ -27,7 +27,9 @@ jobs:
             
             if (foundRelease) {
               console.log(`Found release ${foundRelease.name} with tag ${foundRelease.tag_name}`);
-              console.log(`::set-output name=releaseName::${foundRelease.name}`);
+              const output = `releaseName=${foundRelease.name}`;
+              console.log(output);
+              #console.log(`::set-output name=releaseName::${foundRelease.name}`);
             } else {
               console.log(`No release found with the name ${releaseNameToFind}`);
             }
