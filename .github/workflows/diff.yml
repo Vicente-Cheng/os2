@@ -27,7 +27,7 @@ jobs:
             const foundRelease = releases.find(release => release.name.includes(releaseNameToFind));
 
             if (foundRelease) {
-              echo "releaseName=$foundRelease.name" >> "$GITHUB_OUTPUT"
+              echo "releaseName=v1.3-xxxxxx" >> "$GITHUB_OUTPUT"
             } else {
               console.log(`No release found with the name ${releaseNameToFind}`);
               return { error: `No release found with the name ${releaseNameToFind}` };
