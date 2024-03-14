@@ -10,9 +10,12 @@ env:
 jobs:
   get-all-releases:
     runs-on: ubuntu-latest
+    outputs:
+      allReleases: ${{ steps.get_all_releases.output.allReleases }}
 
     steps:
-      - name: Get all release
+      - name: Get all releases
+        id: get_all_releases
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
