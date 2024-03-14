@@ -93,10 +93,9 @@ jobs:
           retry_wait_seconds: 60
           command: 'docker pull ${{ steps.set_os_image.outputs.osImage }}'
       - name: Run container-diff for v1.3.x
-        if: steps.get_release_v1_3_x.outputs.found
         run: |
           docker pull ${{ env.OS_IMAGE_v1_3_x }}
           echo "Diff ${{ env.OS_IMAGE_v1_3_x }} with ${{ steps.set_os_image.outputs.osImage }}..."
-          container-diff diff daemon://docker.io/${{ env.OS_IMAGE_v1_3_x }} daemon://docker.io/${{ steps.set_os_image.outputs.osImage }} --type=rpm --output=diff-result-v1.3.x.txt
-          cat diff-result-v1.3.x.txt
+          container-diff diff daemon://docker.io/${{ env.OS_IMAGE_v1_3_x }} daemon://docker.io/${{ steps.set_os_image.outputs.osImage }} --type=rpm --output=diff-result.txt
+          cat diff-result.txt
 
