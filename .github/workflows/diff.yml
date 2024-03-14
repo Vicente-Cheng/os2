@@ -34,6 +34,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: debug-0
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.setOutput('found', false);
+            const releases = ${{ needs.get-all-releases.outputs.allReleases }};
+            const releaseNameToFind = "v1.3";
+            const foundRelease = releases.find(release => release.name.includes(releaseNameToFind));
+
+            if (foundRelease) {
+              const releaseName = foundRelease.name;
+              console.log(releaseName)
+            } else {
+              console.log("NOT FOUND!")
+            }
       - name: debug
         run: |
           echo "${{ needs.get-all-releases.outputs.testOutput }}"
