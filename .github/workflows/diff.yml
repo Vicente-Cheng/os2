@@ -11,8 +11,8 @@ jobs:
   get-all-releases:
     runs-on: ubuntu-latest
     outputs:
-      releases: ${{ steps.get_all_releases.outputs.allReleases }}
-      testOutput: ${{ steps.get_all_releases.outputs.testOutput-1 }}
+      releaseName_v1_3_x: ${{ steps.get_release_v1_3_x.outputs.releaseName }}
+      releaseName_v1_2_x: ${{ steps.get_release_v1_2_x.outputs.releaseName }}
 
     steps:
       - name: Get all releases
@@ -28,31 +28,43 @@ jobs:
             
             const releases = response.data;
             core.setOutput('allReleases', releases);
-            core.setOutput('testOutput-1', 'hello world!');
-  debug-job:
-    needs: get-all-releases
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: debug-0
+      - name: Get v1.3 latest release
+        id: get_release_v1_3_x
         uses: actions/github-script@v6
         with:
           script: |
             core.setOutput('found', false);
-            const releases = ${{ needs.get-all-releases.outputs.allReleases }};
+            const releases = ${{ steps.get_all_releases.outputs.allReleases }};
             const releaseNameToFind = "v1.3";
             const foundRelease = releases.find(release => release.name.includes(releaseNameToFind));
 
             if (foundRelease) {
               const releaseName = foundRelease.name;
-              console.log(releaseName)
-            } else {
-              console.log("NOT FOUND!")
+              core.setOutput('releaseName', releaseName);
             }
+      - name: Get v1.2 latest release
+        id: get_release_v1_2_x
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.setOutput('found', false);
+            const releases = ${{ steps.get_all_releases.outputs.allReleases }};
+            const releaseNameToFind = "v1.2";
+            const foundRelease = releases.find(release => release.name.includes(releaseNameToFind));
+
+            if (foundRelease) {
+              const releaseName = foundRelease.name;
+              core.setOutput('releaseName', releaseName);
+            }
+  debug-job:
+    needs: get-all-releases
+    runs-on: ubuntu-latest
+
+    steps:
       - name: debug
         run: |
-          echo "${{ needs.get-all-releases.outputs.testOutput }}"
-          echo "release: ${{ needs.get-all-releases.outputs.allReleases }}"
+          echo "${{ needs.get-all-releases.outputs.releaseName_v1_3_x }}"
+          echo "${{ needs.get-all-releases.outputs.releaseName_v1_2_x }}"
 
   Fetch-v1-3-x-diff:   
     needs: get-all-releases
