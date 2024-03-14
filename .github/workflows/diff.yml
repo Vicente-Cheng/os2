@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       releases: ${{ steps.get_all_releases.outputs.allReleases }}
+      testOutput: ${{ steps.get_all_releases.outputs.testOutput-1 }}
 
     steps:
       - name: Get all releases
@@ -27,6 +28,7 @@ jobs:
             
             const releases = response.data;
             core.setOutput('allReleases', releases);
+            core.setOutput('testOutput-1', 'hello world!');
   debug-job:
     needs: get-all-releases
     runs-on: ubuntu-latest
@@ -34,6 +36,7 @@ jobs:
     steps:
       - name: debug
         run: |
+          echo "${{ needs.get-all-releases.outputs.testOutput }}"
           echo "release: ${{ needs.get-all-releases.outputs.allReleases }}"
 
   Fetch-v1-3-x-diff:   
