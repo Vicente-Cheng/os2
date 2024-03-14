@@ -24,7 +24,15 @@ jobs:
             
             const releases = response.data;
             core.setOutput('allReleases', releases);
-            
+  debug-job:
+    needs: get-all-releases
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: debug
+        run: |
+          echo "release: ${{ needs.get-all-releases.outputs.allReleases }}"
+
   Fetch-v1-3-x-diff:   
     needs: get-all-releases
     runs-on: ubuntu-latest
