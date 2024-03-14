@@ -11,7 +11,7 @@ jobs:
   get-all-releases:
     runs-on: ubuntu-latest
     outputs:
-      allReleases: ${{ steps.get_all_releases.output.allReleases }}
+      releases: ${{ steps.get_all_releases.outputs.allReleases }}
 
     steps:
       - name: Get all releases
@@ -43,13 +43,26 @@ jobs:
       image: registry.suse.com/bci/bci-base:15.4
 
     steps:
+      - name: Get all releases
+        id: get_all_releases
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const response = await github.rest.repos.listReleases({
+            owner: context.repo.owner,
+            repo: context.repo.repo
+            });
+            
+            const releases = response.data;
+            core.setOutput('allReleases', releases);
       - name: Get v1.3 latest release
         id: get_release_v1_3_x
         uses: actions/github-script@v6
         with:
           script: |
             core.setOutput('found', false);
-            const releases = ${{ needs.get-all-releases.outputs.allReleases }};
+            const releases = ${{ steps.get_all_releases.outputs.allReleases }};
             const releaseNameToFind = "v1.3";
             const foundRelease = releases.find(release => release.name.includes(releaseNameToFind));
 
