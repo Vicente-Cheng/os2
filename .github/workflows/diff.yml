@@ -35,7 +35,7 @@ jobs:
             core.setOutput('found', false);
             const releases = ${{ steps.get_all_releases.outputs.allReleases }};
             const releaseNameToFind = "v1.3";
-            const foundRelease = releases.find(release => release.name.includes(releaseNameToFind));
+            const foundRelease = releases.startsWith(release => release.name.includes(releaseNameToFind));
 
             if (foundRelease) {
               const releaseName = foundRelease.name;
