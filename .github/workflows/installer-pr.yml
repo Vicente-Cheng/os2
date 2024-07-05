@@ -15,7 +15,7 @@ jobs:
         id: get-target-version
         with:
           script: |
-            const fullBranchName = context.ref.replace('refs/heads/', '');
+            const fullBranchName = context.ref.replace('refs/tags/', '');
             console.log(`Full branch name: ${fullBranchName}`);
             
             const targetVersion = fullBranchName.split('-')[0];
