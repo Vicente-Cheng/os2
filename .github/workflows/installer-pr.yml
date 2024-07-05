@@ -10,25 +10,19 @@ jobs:
   create-installer-pr:
     runs-on: ubuntu-latest
     steps:
-      - uses: jungwinter/split@v2
-        id: spliter
+      - name: Extract branch name
+        uses: actions/github-script@v7
+        id: get-target-version
         with:
-          msg: ${{ github.ref_name }}
-          separator: '-'
-      - name: Clone harvester-installer repo
-        uses: actions/checkout@v3
-        with:
-          repository: harvester/harvester-installer
-          ref: ${{ steps.spliter.outputs._0 }}
-      - name: Get current OS image from installer
+          script: |
+            const fullBranchName = context.ref_name;
+            console.log(`Full branch name: ${fullBranchName}`);
+            
+            const targetVersion = fullBranchName.split('-')[0];
+            console.log(`targetVersion: ${targetVersion}`);
+            
+            core.setOutput('targetVersion', targetVersion);
+
+      - name: Use branch version
         run: |
-          curl -sfL https://raw.githubusercontent.com/harvester/harvester-installer/${{ steps.spliter.outputs._0 }}/scripts/package-harvester-os -o /tmp/package-harvester-os
-          grep '^BASE_OS_IMAGE="rancher/harvester-os:' /tmp/package-harvester-os
-      - name: Update os image
-        run: |
-          sed -i "s,^BASE_OS_IMAGE=.*,BASE_OS_IMAGE=\"${{ env.IMAGE_NAME }}\"," scripts/package-harvester-os
-          echo "patched result: $(grep ^BASE_OS_IMAGE scripts/package-harvester-os)"
-      - name: Update nv driver
-        run: |
-          sed -i "/tag:/ {N; /harvester-nvidia-driver-toolkit/ s/tag:.*\n/tag: ${{ github.ref_name }}\n/}" pkg/config/templates/rancherd-22-addons.yaml
-          echo "patched result: $(grep -B1 harvester-nvidia-driver-toolkit pkg/config/templates/rancherd-22-addons.yaml)"
+          echo "The extracted version is: ${{ steps.get-target-version.outputs.targetVersion }}"
