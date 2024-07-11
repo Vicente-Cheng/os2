@@ -10,6 +10,11 @@ jobs:
   create-installer-pr:
     runs-on: ubuntu-latest
     steps:
+      - name: running echo
+        id: do_echo
+        run: |
+           echo "running echo"
+
       - name: Extract branch name
         uses: actions/github-script@v7
         id: get-target-version
@@ -24,5 +29,6 @@ jobs:
             core.setOutput('targetVersion', targetVersion);
 
       - name: Use branch version
+        if: steps.do_echo.conclusion == 'success'
         run: |
           echo "The extracted version is: ${{ steps.get-target-version.outputs.targetVersion }}"
