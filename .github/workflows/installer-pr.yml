@@ -40,6 +40,6 @@ jobs:
           echo "The extracted version is: ${{ steps.get-target-version.outputs.targetVersion }}"
 
       - name: Use branch version (Always and check)
-        if: always() && ${{ env.RUN_ECHO_OK == 'false' }}
+        if: always() && ${{ env.RUN_ECHO_OK == 'true' }}
         run: |
           echo "The extracted version is: ${{ steps.get-target-version.outputs.targetVersion }}"
