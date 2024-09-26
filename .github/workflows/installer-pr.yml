@@ -30,7 +30,16 @@ jobs:
             
             core.setOutput('targetVersion', targetVersion);
 
+      - name: Sim Error
+        run: |
+          exit 1
+
       - name: Use branch version
         if: ${{ env.RUN_ECHO_OK == 'true' }}
+        run: |
+          echo "The extracted version is: ${{ steps.get-target-version.outputs.targetVersion }}"
+
+      - name: Use branch version (Always and check)
+        if: always() && ${{ env.RUN_ECHO_OK == 'false' }}
         run: |
           echo "The extracted version is: ${{ steps.get-target-version.outputs.targetVersion }}"
